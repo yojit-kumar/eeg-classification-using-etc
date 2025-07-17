@@ -1,18 +1,14 @@
 import os
 import time
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 import seaborn as sns
 
-plt.rcParams.update({
-    "font.family": "serif",
-    })
 
 
 def plot_heatmap(df, result_dir):
     df['delta'] = df['ETC_EyesOpen'] - df['ETC_EyesClosed']
-    avg_delta = df.groupby('channel')
+    avg_delta = df.groupby('channel')['delta'].mean()
 
 
     electrode_coords = {
@@ -41,6 +37,11 @@ def plot_heatmap(df, result_dir):
 
     electrode_coords = new_coords
 
+
+    plt.rcParams.update({
+        "font.family": "serif",
+        })
+
     # Create heatmap grid
     heatmap = np.full((11, 11), np.nan)
     for ch, delta_val in avg_delta.items():
@@ -51,30 +52,30 @@ def plot_heatmap(df, result_dir):
 
     # Plot heatmap
     fig, ax = plt.subplots(figsize=(8,8))
-    cmap = sns.diverging_palette(240, 10, as_cmap=True)
+    cmap = sns.diverging_palette(210, 30, as_cmap=True)
     sns.heatmap(
         heatmap, 
         cmap=cmap, 
-        square=True, # Create heatmap grid
+        square=True,
         mask=np.isnan(heatmap), 
         ax=ax
     )
 
     # Annotate electrodes
     for ch, (x, y) in electrode_coords.items():
-        if heatmap[y, x] is not np.nan:# Create heatmap grid
+        if heatmap[y, x] is not np.nan:
             ax.text(
                 x + 0.5, y + 0.5, ch, 
                 ha='center', va='center',
-                fontsize=10, color='black', weight='bold'
-            )
+                fontsize=10, color='black'
+                )
 
     # Final adjustments
-    ax.set_title("Average ETC Difference for all Channels", fontsize=16, weight='bold')
+    ax.set_title("Average ETC Difference for all Channels", fontsize=16)
     ax.axis('off')  # Remove axis ticks and labels
     plt.tight_layout()
 
-    timestr = time.strftime("%y%m%d-%H%m%S")
+    timestr = time.strftime("%y%m%d-%H%M%S")
     result_path = os.path.join(result_dir, f"etc_difference_heatmap_{timestr}.png")
 
     # Save high-resolution figure
