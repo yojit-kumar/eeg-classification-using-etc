@@ -24,7 +24,7 @@ def data_split(dataframe):
         if len(etc_1) == 64 and len(etc_2) == 64:
             X.append(etc_1)
             y.append([0])
-            X.append([etc_2])
+            X.append(etc_2)
             y.append([1])
 
     X = np.array(X)
