@@ -10,7 +10,7 @@ from sklearn.ensemble import AdaBoostClassifier
 
 
 def data_split(dataframe):
-    volunteers = dataframe['volunteers'].unique()
+    volunteers = dataframe['volunteer'].unique()
     X = []
     y = []
 
