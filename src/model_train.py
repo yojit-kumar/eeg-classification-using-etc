@@ -48,7 +48,7 @@ def adaboost_train(X_train, y_train):
     BESTF1 = 0
     FOLD_NO = 5
 
-    KF = KFold(n_split=FOLD_NO, random_state=42, shuffle=True)
+    KF = KFold(n_splits=FOLD_NO, random_state=42, shuffle=True)
     KF.get_n_splits(X_train)
 
     for NEST in n_estimator:
