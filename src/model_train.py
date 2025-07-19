@@ -1,10 +1,9 @@
 import os
 import numpy as np
-import pandas as pd
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from sklearn.model_selction import KFold
+from sklearn.model_selection import KFold
 
 
 from sklearn.ensemble import AdaBoostClassifier
