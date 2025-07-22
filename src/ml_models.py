@@ -8,6 +8,8 @@ from sklearn.model_selection import KFold
 
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 
 def data_split(dataframe):
     volunteers = dataframe['volunteer'].unique()
@@ -198,4 +200,116 @@ def decisiontree_test(X_train, y_train, X_test, y_test):
     np.save(RESULT_PATH+"/PRECISION_TEST.npy", np.array([prec]) )
     np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
 
-                    
+
+
+
+def gaussiannb(X_test, y_test, X_train, y_train):
+    RESULT_PATH = '../results/parameters/gnb/'
+
+    clf = GaussianNB()
+    clf.fit(X_train, y_train.ravel())
+
+    Y_TEST = y_test
+    Y_PRED = clf.predict(X_test)
+
+    acc = accuracy_score(Y_TEST, Y_PRED)
+    f1 = f1_score(Y_TEST, Y_PRED, average='macro')
+    prec = precision_score(Y_TEST, Y_PRED, average='macro')
+    recall = recall_score(Y_TEST, Y_PRED, average='macro')
+
+    print('ACCURACY', acc)
+    print('TESTING F1 Score', f1)
+    print('PRECISION', prec)
+    print('RECALL', recall)
+
+    try:
+        os.makedirs(RESULT_PATH)
+    except OSError:
+        print("Creation of result dir not required")
+
+    np.save(RESULT_PATH+"/F1SCORE_TEST.npy", np.array([f1]) )
+    np.save(RESULT_PATH+"/ACCURACY_TEST.npy", np.array([acc]) )
+    np.save(RESULT_PATH+"/PRECISION_TEST.npy", np.array([prec]) )
+    np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
+    
+
+
+
+def knn_train(X_train, y_train):
+    k_values = [1, 3, 5, 7, 9, 11]
+
+    BESTF1 = 0
+    FOLD_NO = 5
+
+    KF = KFold(n_splits=FOLD_NO, random_state=42, shuffle=True)
+    KF.get_n_splits(X_train)
+
+    for K in k_values:
+        FSCORE_TEMP = []
+
+        for train_idx, val_idx in KF.split(X_train):
+            X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
+            Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
+
+            clf = KNeighborsClassifier(n_neighbours = K)
+            clf.fit(X_TRAIN, Y_TRAIN.ravel())
+            Y_PRED = clf.predict(X_VAL)
+            
+            f1 = f1_score(Y_VAL, Y_PRED, average='macro')
+            FSCORE_TEMP.append(f1)
+        
+        MEAN_FSCORE_TEMP = np.mean(FSCORE_TEMP)
+        if MEAN_FSCORE_TEMP > BESTF1:
+            BESTF1 = MEAN_FSCORE_TEMP
+            BESTK = K
+
+    RESULT_PATH = '../results/parameters/kNN/'
+
+    try:
+        os.makedirs(RESULT_PATH)
+    except OSError:
+        print("Creation of result dir not required")
+
+    np.save(RESULT_PATH+"K.npy", np.array([BESTK]))
+    np.save(RESULT_PATH+"F1SCORE_TEST.npy", np.array([BESTF1]))
+
+    print('Training Finished !')
+
+
+def knn_test(X_train, y_train, X_test, y_test):
+    RESULT_PATH = '../resutls/parameters/kNN/'
+
+    K = np.load(RESULT_PATH+"K.npy")[0]
+    F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
+
+    clf = KNeighborsClassifier(n_neighbours=K)
+    clf.fit(X_train, y_train)
+
+    Y_TEST = y_test
+    Y_PRED = clf.predict(X_test)
+
+    acc = accuracy_score(Y_TEST, Y_PRED)
+    f1 = f1_score(Y_TEST, Y_PRED, average='macro')
+    prec = precision_score(Y_TEST, Y_PRED, average='macro')
+    recall = recall_score(Y_TEST, Y_PRED, average='macro')
+
+
+    print('TRAINING F1 Score', F1SCORE)
+
+    print('ACCURACY', acc)
+    print('TESTING F1 Score', f1)
+    print('PRECISION', prec)
+    print('RECALL', recall)
+
+    np.save(RESULT_PATH+"/F1SCORE_TEST.npy", np.array([f1]) )
+    np.save(RESULT_PATH+"/ACCURACY_TEST.npy", np.array([acc]) )
+    np.save(RESULT_PATH+"/PRECISION_TEST.npy", np.array([prec]) )
+    np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
+
+
+
+
+
+
+
+
