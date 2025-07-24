@@ -273,7 +273,7 @@ def knn_train(X_train, y_train):
         print("Creation of result dir not required")
 
     np.save(RESULT_PATH+"K.npy", np.array([BESTK]))
-    np.save(RESULT_PATH+"F1SCORE_TEST.npy", np.array([BESTF1]))
+    np.save(RESULT_PATH+"F1SCORE.npy", np.array([BESTF1]))
 
     print('Training Finished !')
 
@@ -343,7 +343,8 @@ def logisticr_train(X_train, y_train):
         print("Creation of result dir not required")
 
     np.save(RESULT_PATH+"C.npy", np.array([BESTC]))
-    np.save(RESULT_PATH+"F1SCORE_TEST.npy", np.array([BESTF1]))
+    np.save(RESULT_PATH+"F1SCORE.npy", np.array([BESTF1]))
+
 
     print('Training Finished !')
 
@@ -499,7 +500,7 @@ def svm_train(X_train, y_train):
         print("Creation of result dir not required")
 
     np.save(RESULT_PATH+"C.npy", np.array([BESTC]))
-    np.save(RESULT_PATH+"F1SCORE_TEST.npy", np.array([BESTF1]))
+    np.save(RESULT_PATH+"F1SCORE.npy", np.array([BESTF1]))
 
     print('Training Finished !')
 
