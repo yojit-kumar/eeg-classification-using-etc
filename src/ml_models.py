@@ -284,7 +284,7 @@ def knn_test(X_train, y_train, X_test, y_test):
     K = np.load(RESULT_PATH+"K.npy")[0]
     F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
 
-    clf = KNeighborsClassifier(n_neighbours=K)
+    clf = KNeighborsClassifier(n_neighbors=K)
     clf.fit(X_train, y_train)
 
     Y_TEST = y_test
@@ -357,7 +357,7 @@ def logisticr_test(X_train, y_train, X_test, y_test):
 
     
     clf = LogisticRegression(penalty='l1', C=C, random_state=42, solver='liblinear')
-    clf.fit(X_train, y_train)
+    clf.fit(X_train, y_train.ravel())
 
     Y_TEST = y_test
     Y_PRED = clf.predict(X_test)
@@ -440,7 +440,7 @@ def randomforest_test(X_train, y_train, X_test, y_test):
 
     
     clf = RandomForestClassifier(n_estimators=NEST, max_depth=MD, min_samples_leaf=MSL, random_state=42)
-    clf.fit(X_train, y_train)
+    clf.fit(X_train, y_train.ravel())
 
     Y_TEST = y_test
     Y_PRED = clf.predict(X_test)
@@ -513,7 +513,7 @@ def svm_test(X_train, y_train, X_test, y_test):
 
     
     clf = SVC(C=C, random_state=42)
-    clf.fit(X_train, y_train)
+    clf.fit(X_train, y_train.ravel())
 
     Y_TEST = y_test
     Y_PRED = clf.predict(X_test)
