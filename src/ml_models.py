@@ -10,6 +10,9 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 def data_split(dataframe):
     volunteers = dataframe['volunteer'].unique()
@@ -46,7 +49,7 @@ def data_split(dataframe):
 
 
 def adaboost_train(X_train, y_train):
-    n_estimator = [1, 10, 50, 100, 500, 1000, 5000, 10000] #estimation parameters
+    n_estimator = [50, 100, 200, 300]
     BESTF1 = 0
     FOLD_NO = 5
 
@@ -134,11 +137,11 @@ def decisiontree_train(X_train, y_train):
         for MD in md_values:
             for CCP in alpha:
                 FSCORE_TEMP = []
+                clf = DecisionTreeClassifier(min_samples_leaf=MSL, random_state=42, max_depth=MD, ccp_alpha=CCP)
                 for train_idx, val_idx in KF.split(X_train):
                     X_TRAIN, X_VAL = X_train[train_idx], X_train[val_idx]
                     Y_TRAIN, Y_VAL = y_train[train_idx], y_train[val_idx]
 
-                    clf = DecisionTreeClassifier(min_samples_leaf=MSL, random_state=42, max_depth=MD, ccp_alpha=CCP)
                     clf.fit(X_TRAIN, Y_TRAIN.ravel())
                     Y_PRED = clf.predict(X_VAL)
 
@@ -246,12 +249,11 @@ def knn_train(X_train, y_train):
 
     for K in k_values:
         FSCORE_TEMP = []
-
+        clf = KNeighborsClassifier(n_neighbours = K)
         for train_idx, val_idx in KF.split(X_train):
             X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
             Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
 
-            clf = KNeighborsClassifier(n_neighbours = K)
             clf.fit(X_TRAIN, Y_TRAIN.ravel())
             Y_PRED = clf.predict(X_VAL)
             
@@ -277,7 +279,7 @@ def knn_train(X_train, y_train):
 
 
 def knn_test(X_train, y_train, X_test, y_test):
-    RESULT_PATH = '../resutls/parameters/kNN/'
+    RESULT_PATH = '../results/parameters/kNN/'
 
     K = np.load(RESULT_PATH+"K.npy")[0]
     F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
@@ -307,9 +309,228 @@ def knn_test(X_train, y_train, X_test, y_test):
     np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
 
 
+def logisticr_train(X_train, y_train):
+    C_values = [0.001, 0.01, 0.1, 10, 100, 1000]
+
+    BESTF1 = 0
+    FOLD_NO= 5
+    
+    KF = KFold(n_splits=FOLD_NO, random_state=42, shuffle=True)
+
+    for C in C_values:
+        FSCORE_TEMP=[]
+        clf = LogisticRegression(penalty='l1', C=C, random_state=42, solver='liblinear')
+        for train_idx, val_idx, in KF.split(X_train):
+            X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
+            Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
+
+            clf.fit(X_TRAIN, Y_TRAIN.ravel())
+            Y_PRED = clf.predict(X_VAL)
+            
+            f1 = f1_score(Y_VAL, Y_PRED, average='macro')
+            FSCORE_TEMP.append(f1)
+        
+        MEAN_FSCORE_TEMP = np.mean(FSCORE_TEMP)
+        if MEAN_FSCORE_TEMP > BESTF1:
+            BESTF1 = MEAN_FSCORE_TEMP
+            BESTC = C
+
+    RESULT_PATH = '../results/parameters/LR/'
+
+    try:
+        os.makedirs(RESULT_PATH)
+    except OSError:
+        print("Creation of result dir not required")
+
+    np.save(RESULT_PATH+"C.npy", np.array([BESTC]))
+    np.save(RESULT_PATH+"F1SCORE_TEST.npy", np.array([BESTF1]))
+
+    print('Training Finished !')
+
+
+def logisticr_test(X_train, y_train, X_test, y_test):
+    RESULT_PATH = '../results/parameters/LR/'
+
+    C = np.load(RESULT_PATH+"C.npy")[0]
+    F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
+
+    
+    clf = LogisticRegression(penalty='l1', C=C, random_state=42, solver='liblinear')
+    clf.fit(X_train, y_train)
+
+    Y_TEST = y_test
+    Y_PRED = clf.predict(X_test)
+
+    acc = accuracy_score(Y_TEST, Y_PRED)
+    f1 = f1_score(Y_TEST, Y_PRED, average='macro')
+    prec = precision_score(Y_TEST, Y_PRED, average='macro')
+    recall = recall_score(Y_TEST, Y_PRED, average='macro')
+
+
+    print('TRAINING F1 Score', F1SCORE)
+
+    print('ACCURACY', acc)
+    print('TESTING F1 Score', f1)
+    print('PRECISION', prec)
+    print('RECALL', recall)
+
+    np.save(RESULT_PATH+"/F1SCORE_TEST.npy", np.array([f1]) )
+    np.save(RESULT_PATH+"/ACCURACY_TEST.npy", np.array([acc]) )
+    np.save(RESULT_PATH+"/PRECISION_TEST.npy", np.array([prec]) )
+    np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
+
+
+
+def randomforest_train(X_train, y_train):
+    n_estimators = [100, 200, 300, 500]
+    md_values = [3, 5, 10, None]
+    msl_values = [1,2,4]
+
+    BESTF1 = 0
+    FOLD_NO = 5
+    
+    KF = KFold(n_splits=FOLD_NO, random_state=42, shuffle=True)
+
+    for NEST in n_estimators:
+        for MD in md_values:
+            for MSL in msl_values:
+                FSCORE_TEMP = []
+                clf = RandomForestClassifier(n_estimators=NEST, max_depth=MD, min_samples_leaf=MSL, random_state=42)
+                for train_idx, val_idx in KF.split(X_train):
+                    X_TRAIN, X_VAL = X_train[train_idx], X_train[val_idx]
+                    Y_TRAIN, Y_VAL = y_train[train_idx], y_train[val_idx]
+
+                    clf.fit(X_TRAIN, Y_TRAIN.ravel())
+                    Y_PRED = clf.predict(X_VAL)
+
+                    f1 = f1_score(Y_VAL, Y_PRED, average='macro')
+                    FSCORE_TEMP.append(f1)
+
+                MEAN_FSCORE_TEMP = np.mean(FSCORE_TEMP)
+                if MEAN_FSCORE_TEMP > BESTF1:
+                    BESTF1 = MEAN_FSCORE_TEMP
+                    BESTMSL = MSL
+                    BESTMD = MD
+                    BESTNEST = NEST
+
+
+    RESULT_PATH = '../results/parameters/randomforest/'
+
+    try:
+        os.makedirs(RESULT_PATH)
+    except OSError:
+        print("Creation of result dir not required")
+
+    np.save(RESULT_PATH+"MSL.npy", np.array([BESTMSL]))
+    np.save(RESULT_PATH+"MD.npy", np.array([BESTMD]))
+    np.save(RESULT_PATH+"NEST.npy", np.array([BESTNEST]))
+    np.save(RESULT_PATH+"F1SCORE.npy", np.array([BESTF1]))
+
+    print("Training Finished!")
+
+
+def randomforest_test(X_train, y_train, X_test, y_test):
+    RESULT_PATH = '../results/parameters/randomforest/'
+
+    NEST = np.load(RESULT_PATH+"NEST.npy")[0]
+    MD = np.load(RESULT_PATH+"MD.npy")[0]
+    MSL = np.load(RESULT_PATH+"MSL.npy")[0]
+    F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
+
+    
+    clf = RandomForestClassifier(n_estimators=NEST, max_depth=MD, min_samples_leaf=MSL, random_state=42)
+    clf.fit(X_train, y_train)
+
+    Y_TEST = y_test
+    Y_PRED = clf.predict(X_test)
+
+    acc = accuracy_score(Y_TEST, Y_PRED)
+    f1 = f1_score(Y_TEST, Y_PRED, average='macro')
+    prec = precision_score(Y_TEST, Y_PRED, average='macro')
+    recall = recall_score(Y_TEST, Y_PRED, average='macro')
+
+
+    print('TRAINING F1 Score', F1SCORE)
+
+    print('ACCURACY', acc)
+    print('TESTING F1 Score', f1)
+    print('PRECISION', prec)
+    print('RECALL', recall)
+
+    np.save(RESULT_PATH+"/F1SCORE_TEST.npy", np.array([f1]) )
+    np.save(RESULT_PATH+"/ACCURACY_TEST.npy", np.array([acc]) )
+    np.save(RESULT_PATH+"/PRECISION_TEST.npy", np.array([prec]) )
+    np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
 
 
 
 
+def svm_train(X_train, y_train):
+    C_values = [0.1, 1, 10, 100]
+
+    BESTF1 = 0
+    FOLD_NO= 5
+    
+    KF = KFold(n_splits=FOLD_NO, random_state=42, shuffle=True)
+
+    for C in C_values:
+        FSCORE_TEMP=[]
+        clf = SVC(C=C, random_state=42)
+        for train_idx, val_idx, in KF.split(X_train):
+            X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
+            Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
+
+            clf.fit(X_TRAIN, Y_TRAIN.ravel())
+            Y_PRED = clf.predict(X_VAL)
+            
+            f1 = f1_score(Y_VAL, Y_PRED, average='macro')
+            FSCORE_TEMP.append(f1)
+        
+        MEAN_FSCORE_TEMP = np.mean(FSCORE_TEMP)
+        if MEAN_FSCORE_TEMP > BESTF1:
+            BESTF1 = MEAN_FSCORE_TEMP
+            BESTC = C
+
+    RESULT_PATH = '../results/parameters/SVM/'
+
+    try:
+        os.makedirs(RESULT_PATH)
+    except OSError:
+        print("Creation of result dir not required")
+
+    np.save(RESULT_PATH+"C.npy", np.array([BESTC]))
+    np.save(RESULT_PATH+"F1SCORE_TEST.npy", np.array([BESTF1]))
+
+    print('Training Finished !')
 
 
+def svm_test(X_train, y_train, X_test, y_test):
+    RESULT_PATH = '../results/parameters/SVM/'
+
+    C = np.load(RESULT_PATH+"C.npy")[0]
+    F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
+
+    
+    clf = SVC(C=C, random_state=42)
+    clf.fit(X_train, y_train)
+
+    Y_TEST = y_test
+    Y_PRED = clf.predict(X_test)
+
+    acc = accuracy_score(Y_TEST, Y_PRED)
+    f1 = f1_score(Y_TEST, Y_PRED, average='macro')
+    prec = precision_score(Y_TEST, Y_PRED, average='macro')
+    recall = recall_score(Y_TEST, Y_PRED, average='macro')
+
+
+    print('TRAINING F1 Score', F1SCORE)
+
+    print('ACCURACY', acc)
+    print('TESTING F1 Score', f1)
+    print('PRECISION', prec)
+    print('RECALL', recall)
+
+    np.save(RESULT_PATH+"/F1SCORE_TEST.npy", np.array([f1]) )
+    np.save(RESULT_PATH+"/ACCURACY_TEST.npy", np.array([acc]) )
+    np.save(RESULT_PATH+"/PRECISION_TEST.npy", np.array([prec]) )
+    np.save(RESULT_PATH+"/RECALL_TEST.npy", np.array([recall]) )
