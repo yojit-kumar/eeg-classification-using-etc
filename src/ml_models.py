@@ -249,7 +249,7 @@ def knn_train(X_train, y_train):
 
     for K in k_values:
         FSCORE_TEMP = []
-        clf = KNeighborsClassifier(n_neighbours = K)
+        clf = KNeighborsClassifier(n_neighbors = K)
         for train_idx, val_idx in KF.split(X_train):
             X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
             Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
@@ -320,7 +320,7 @@ def logisticr_train(X_train, y_train):
     for C in C_values:
         FSCORE_TEMP=[]
         clf = LogisticRegression(penalty='l1', C=C, random_state=42, solver='liblinear')
-        for train_idx, val_idx, in KF.split(X_train):
+        for train_idx, val_idx in KF.split(X_train):
             X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
             Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
 
@@ -476,7 +476,7 @@ def svm_train(X_train, y_train):
     for C in C_values:
         FSCORE_TEMP=[]
         clf = SVC(C=C, random_state=42)
-        for train_idx, val_idx, in KF.split(X_train):
+        for train_idx, val_idx in KF.split(X_train):
             X_TRAIN, X_VAL = X_train(train_idx), X_train(val_idx)
             Y_TRAIN, Y_VAL = y_train(train_idx), y_train(val_idx)
 
