@@ -285,7 +285,7 @@ def knn_test(X_train, y_train, X_test, y_test):
     F1SCORE = np.load(RESULT_PATH+"F1SCORE.npy")[0]
 
     clf = KNeighborsClassifier(n_neighbors=K)
-    clf.fit(X_train, y_train)
+    clf.fit(X_train, y_train.ravel())
 
     Y_TEST = y_test
     Y_PRED = clf.predict(X_test)
