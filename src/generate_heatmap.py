@@ -58,7 +58,8 @@ def plot_heatmap(df, result_dir):
         cmap=cmap, 
         square=True,
         mask=np.isnan(heatmap), 
-        ax=ax
+        ax=ax,
+        linewidths=0.5
     )
 
     # Annotate electrodes
