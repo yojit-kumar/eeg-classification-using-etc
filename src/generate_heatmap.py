@@ -85,4 +85,4 @@ def plot_heatmap(df, result_dir):
 
 
 if __name__ == "__main__":
-    resut_dir = "../results/tmp/"
+    resut_dir = "../results/figures/"
