@@ -1,6 +1,23 @@
 import os
 import mne
 
+def change_labels(raw1, raw2):
+    """Standardize channel names and set montage."""
+    labels = raw1.ch_names
+    new_names = {}
+    
+    for ch in labels:
+        clean_ch = ch.strip('.')
+        if 'Fp' not in clean_ch:
+            clean_ch = clean_ch.upper()
+        if clean_ch.endswith('Z'):
+            clean_ch = clean_ch[:-1] + 'z'
+        new_names[ch] = clean_ch
+
+    for raw in [raw1, raw2]:
+        raw.rename_channels(new_names)
+        raw.set_montage("standard_1020", verbose=False)
+
 def extract_data(volunteer_id, root_dir):
     v_path = os.path.join(root_dir, volunteer_id)
     task1 = os.path.join(v_path, f'{volunteer_id}R01.edf')
@@ -10,21 +27,7 @@ def extract_data(volunteer_id, root_dir):
     r2 = mne.io.read_raw_edf(task2, preload=True, verbose=False)
 
     #Changing channel labels to standard names
-    labels = r1.ch_names
-    new_names = {}
-    for ch in labels:
-        clean_ch = ch.strip('.')
-        if 'Fp' not in clean_ch:
-            clean_ch = clean_ch.upper()
-        if clean_ch.endswith('Z'):
-            clean_ch = clean_ch[:-1] + 'z'
-
-        new_names[ch] = clean_ch
-
-    r1.rename_channels(new_names)
-    r2.rename_channels(new_names)
-    r1.set_montage("standard_1020")
-    r2.set_montage("standard_1020")
+    change_labels(r1, r2)
     ###########################################
 
     #Crop to get 60 seconds

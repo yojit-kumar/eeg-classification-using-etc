@@ -72,7 +72,7 @@ def plot_heatmap(df, result_dir):
                 )
 
     # Final adjustments
-    ax.set_title("Average ETC Difference for all Channels", fontsize=16)
+    ax.set_title("Average ETC Difference across all Channels", fontsize=16)
     ax.axis('off')  # Remove axis ticks and labels
     plt.tight_layout()
 
