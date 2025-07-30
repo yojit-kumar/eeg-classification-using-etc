@@ -72,7 +72,7 @@ def plot_heatmap(df, result_dir):
                 )
 
     # Final adjustments
-    ax.set_title("Average ETC Difference across all Channels", fontsize=16)
+#   ax.set_title("Average ETC Difference across all Channels", fontsize=16)
     ax.axis('off')  # Remove axis ticks and labels
     plt.tight_layout()
 
@@ -85,4 +85,8 @@ def plot_heatmap(df, result_dir):
 
 
 if __name__ == "__main__":
-    resut_dir = "../results/figures/"
+    result_dir = "../results/tmp/figures/"
+    try:
+        os.makedirs(result_dir)
+    except OSError:
+        print("creation of dirs not required")
