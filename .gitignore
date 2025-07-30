@@ -1,0 +1,14 @@
+# Ignore data
+data/files/*
+
+# Ignore environment
+.env
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+
+# Ignore system files
+.DS_Store
+
+#Ignore temporary runs
+results/tmp/*
