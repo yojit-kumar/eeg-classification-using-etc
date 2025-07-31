@@ -51,7 +51,7 @@ def plot_heatmap(df, result_dir):
 
 
     # Plot heatmap
-    fig, ax = plt.subplots(figsize=(4,4))
+    fig, ax = plt.subplots(figsize=(6,6))
     cmap = sns.diverging_palette(210, 30, as_cmap=True)
     sns.heatmap(
         heatmap, 
