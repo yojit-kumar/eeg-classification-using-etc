@@ -19,9 +19,7 @@ The code in this repository extensively uses [ETCPy](https://github.com/pranaysy
 
    - Create a new environment and install all required dependencies in one step:
      ```bash
-     conda create -n eeg-etc python=3.13.2 \
-       matplotlib pandas numpy scipy scikit-learn \
-       jupyter jupyterlab joblib cython edfio
+     conda create -n eeg-etc python=3.13.2 matplotlib pandas numpy scipy scikit-learn jupyter jupyterlab joblib cython edfio
      ```
 
      Activate the environment:
@@ -57,8 +55,7 @@ The code in this repository extensively uses [ETCPy](https://github.com/pranaysy
 
 ```
 |-- data/               # Folder for storing dataset
-    |-- raw/            # Raw dataset files
-    |-- processed/      # Processed dataset files (optional)
+    |-- files/            # Raw dataset files
 |-- notebooks/          # Jupyter Notebooks for analysis and experiments
 |-- src/                # Source code for models and utilities
     |-- models/         # Code for building and training models
