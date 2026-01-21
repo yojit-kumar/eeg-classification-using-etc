@@ -1,6 +1,6 @@
 # EEG Classification Using ETC
 
-This repository contains the codebase for the research paper titled "EEG Classification Using Extra Trees Classifier (ETC)." This project provides a framework for replicating the results discussed in the paper. The repository is designed to allow researchers and developers to reproduce the experiments and build upon the work.
+This repository contains the codebase for the research paper titled "Effort-To-Compress (ETC) Ratio-Based Feature Extraction & Machine Learning Methods for EEG Signal Classification" This project provides a framework for replicating the results discussed in the paper. The repository is designed to allow researchers and developers to reproduce the experiments and build upon the work.
 
 The code in this repository extensively uses [ETCPy](https://github.com/pranaysy/ETCPy), a Python library for computing Effort To Compress (ETC) using the NSRPS algorithm. Make sure to install this dependency following the instructions below.
 
