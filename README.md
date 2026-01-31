@@ -19,7 +19,7 @@ The code in this repository extensively uses [ETCPy](https://github.com/pranaysy
 
    - Create a new environment and install all required dependencies in one step:
      ```bash
-     conda create -n eeg-etc python=3.13.2 matplotlib pandas numpy scipy scikit-learn jupyter jupyterlab joblib cython edfio
+     conda create -n eeg-etc python=3.13.2 matplotlib pandas numpy scipy scikit-learn jupyter jupyterlab joblib cython
      ```
 
      Activate the environment:
@@ -30,7 +30,7 @@ The code in this repository extensively uses [ETCPy](https://github.com/pranaysy
 3. **Install Additional Pip Packages**  
    There are additional Python packages required for this project that are not available via `conda`. Install them using `pip`:
    ```bash
-   pip install mne pyedflib
+   pip install mne pyedflib efio
    ```
    ### Explanation of Pip Dependencies:
    - **mne**: For processing and analyzing EEG data.
@@ -39,7 +39,7 @@ The code in this repository extensively uses [ETCPy](https://github.com/pranaysy
 4. **Install ETCPy**  
    The project depends on [ETCPy](https://github.com/pranaysy/ETCPy). Install it from its GitHub repository using the following command:
    ```bash
-   pip install git+https://github.com/pranaysy/ETCPy.git
+   pip install git+https://github.com/pranaysy/ETCPy.git --no-build-isolation
    ```
 
 5. **Download the Data**  
